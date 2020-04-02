@@ -67,14 +67,16 @@ def contact_form():
     data = request.get_json()
     app.logger.debug(data)
 
-    mail = Mail(app)
-    msg = Message(subject=f"LEARN: Message from {data['Name']}",
-                  body=f"Name: {data['Name']}\nEmail: {data['Email']}\nMessage: {data['Message']}\n",
-                  sender=data["Email"],
-                  reply_to=data["Email"],
-                  recipients=["tice@adacore.com"])
-    mail.send(msg)
-    return compose_response({'success': False}, 200)
+    time.sleep(5)
+
+    # mail = Mail(app)
+    # msg = Message(subject=f"LEARN: Message from {data['Name']}",
+    #               body=f"Name: {data['Name']}\nEmail: {data['Email']}\nMessage: {data['Message']}\n",
+    #               sender=data["Email"],
+    #               reply_to=data["Email"],
+    #               recipients=["test@test.com"])
+    # mail.send(msg)
+    return compose_response({'success': True}, 200)
 
 
 @widget_bp.route('/run_program/', methods=['POST'])
