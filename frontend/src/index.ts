@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 import './styles/learn.scss';
 import './ts/theme';
 import {Carousel} from './ts/carousel';
@@ -54,5 +56,19 @@ import {Widget, LabWidget} from './ts/widget';
         throw Error('Malformed contact form. No server address specified.');
       }
     });
+
+    if (!Cookies.get('AdaCore_staff') && !Cookies.get('learn_tester')) {
+      const msg = 'You have reached learn.adacore.com staging site. This is ' +
+      'a place for testing new features and is not meant for public ' +
+      'consumption. Please select "Cancel" to be redirected to the main ' +
+      'learn.adacore.com. Select "Ok" to continue to the DANGER ZONE.';
+      if (confirm(msg)) {
+        // set a session cookie so this doesn't pop up on every page
+        Cookies.set('learn_tester', 'TRUE');
+      } else {
+        const pathname = $(location).attr('pathname');
+        window.location.replace('http://learn.adacore.com' + pathname);
+      }
+    }
   });
 }());
