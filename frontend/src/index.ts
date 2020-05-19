@@ -26,16 +26,26 @@ import {Widget, LabWidget} from './ts/widget';
   // The on version doesn't work for some, probably, ridiculous reason...
   // $(document).on('ready', () => {
   $(document).ready(() => {
+    const widgetMap = new Map<string, Array<Widget>>();
+
     $('div.widget_editor').each((index: number, element: HTMLElement) => {
       const exampleServer = $(element).attr('example_server');
 
       if (exampleServer) {
         const isLab = $(element).attr('lab');
+        const projName = $(element).attr('name');
+
         const widget =
-          isLab ? new LabWidget($(element), exampleServer) :
-            new Widget($(element), exampleServer);
+          isLab ? new LabWidget($(element), exampleServer, widgetMap) :
+            new Widget($(element), exampleServer, widgetMap);
 
         widget.render();
+
+        if (widgetMap.has(projName)) {
+          widgetMap.get(projName).push(widget);
+        } else {
+          widgetMap.set(projName, [widget]);
+        }
       } else {
         throw Error('Malformed widget! No server address specified.');
       }

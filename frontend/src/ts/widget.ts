@@ -17,7 +17,7 @@ enum DownloadType {
 
 /** The Widget class */
 export class Widget {
-  private editors: Array<Editor> = [];
+  public editors: Array<Editor> = [];
   protected readonly container: JQuery;
   private readonly name: string;
   private tabs: Tabs = new Tabs();
@@ -29,6 +29,7 @@ export class Widget {
   protected lab = false;
 
   private dlType: DownloadType = DownloadType.Client;
+  private readonly wmap: Map<string, Array<Widget>>;
 
   private readonly server: string;
 
@@ -41,11 +42,15 @@ export class Widget {
    * Constructs the Widget
    * @param {JQuery} container - the container for the widget
    * @param {string} server - the server address:port
+   * @param {Map<string, Array<Widget>>} widgetMap - the mapping of project
+   * name to list of associated widgets
    */
-  constructor(container: JQuery, server: string) {
+  constructor(container: JQuery, server: string,
+      widgetMap: Map<string, Array<Widget>>) {
     const resources: Array<Resource> = [];
     this.server = server;
     this.container = container;
+    this.wmap = widgetMap;
 
     // Read attributes from container object to initialize members
     this.name = container.attr('name');
@@ -121,14 +126,36 @@ export class Widget {
   }
 
   /**
+   * Check to see if the file name is in this widgets editor list
+   * @param {string} fileName - the filename to check
+   * @return {boolean} true if the filename is in the current editor list
+   */
+  private inEditorList(fileName: string): boolean {
+    for (const e of this.editors) {
+      if (e.getResource().basename == fileName) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Collect the resources loaded in the widget and return as list
    * @return {Array<Resource>} return the widget resources
    */
   protected collectResources(): Array<Resource> {
     const files: Array<Resource> = [];
-    this.editors.map((e) => {
-      files.push(e.getResource());
-    });
+
+    // grab resources from all widgets with this.name
+    for (const w of this.wmap.get(this.name)) {
+      w.editors.map((e) => {
+        const resource = e.getResource();
+        if (!this.inEditorList(resource.basename) || w === this) {
+          files.push(resource);
+        }
+      });
+    }
+
     return files.concat(this.shadowFiles);
   }
 
@@ -513,9 +540,12 @@ export class LabWidget extends Widget {
    * Constructs the LabWidget
    * @param {JQuery} container - the container for the widget
    * @param {string} server - the server address:port
+   * @param {Map<string, Array<Widget>>} widgetMap - the mapping of project
+   * name to list of associated widgets
    */
-  constructor(container: JQuery, server: string) {
-    super(container, server);
+  constructor(container: JQuery, server: string,
+      widgetMap: Map<string, Array<Widget>>) {
+    super(container, server, widgetMap);
 
     this.addButton('submit');
 
