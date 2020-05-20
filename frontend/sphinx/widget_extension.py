@@ -70,13 +70,10 @@ LAB_IO_END_REGEX = re.compile(r"--  END LAB IO BLOCK")
 
 LABIO_FILENAME = "lab_io.txt"
 
-CONTACT_REGEX = re.compile(r'(?P<tag>\w+): *(?P<placeholder>\w+): *(?P<attr>.*)')
-
 contact_template = u"""
 <div class="contact-form" example_server="{server_url}">
     <h2 class="contact-title">{header_title}</h2>
     <form>
-        {fields}
     </form>
 </div>
 """
@@ -341,7 +338,7 @@ html_void_elements = [
 ]
 
 class ContactFormDirective(Directive):
-    has_content = True
+    has_content = False
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -351,35 +348,13 @@ class ContactFormDirective(Directive):
     }
 
     def run(self):
-        html = []
-
         if self.arguments:
             title = self.arguments[0]
-
-        for line in self.content:
-            m = CONTACT_REGEX.match(line)
-            if m:
-                tag = m.group('tag')
-                placeholder = m.group('placeholder')
-                attr = m.group('attr')
-
-                label = f"<label for={placeholder}>{placeholder}</label>"
-                field = f"<{tag} name={placeholder} placeholder={placeholder} {attr}>"
-
-                if not tag in html_void_elements:
-                    field += f"</{tag}>"
-
-                html.append(label)
-                html.append(field)
-
-            else:
-                raise Exception("Malformed contact form")
 
         return [
             nodes.raw('',
                       contact_template.format(server_url=WIDGETS_SERVER_URL,
-                                              header_title=title,
-                                              fields="\n".join(html)),
+                                              header_title=title),
                       format='html')
         ]
 

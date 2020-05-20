@@ -16,9 +16,4 @@ If you have any question or issues with learn.adacore.com, we would love to hear
 
 .. contact:: Contact Us
 
-    input: Name: type="text"
-    input: Email: type="email"
-    textarea: Message: rows="5" type="text"
-    input: Submit: type="submit"
-
 `AdaCore's Privacy Policy <https://www.adacore.com/company/privacy/>`_
